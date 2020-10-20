@@ -108,7 +108,7 @@
         "Country": "Japan",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/male/50.jpg",
+                "Url": "https://randomuser.me/api/portraits/men/50.jpg",
                 "IsMain": true
             }
         ]
@@ -127,7 +127,7 @@
         "Country": "Chad",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/male/74.jpg",
+                "Url": "https://randomuser.me/api/portraits/men/74.jpg",
                 "IsMain": true
             }
         ]
@@ -146,7 +146,7 @@
         "Country": "Niger",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/male/17.jpg",
+                "Url": "https://randomuser.me/api/portraits/men/17.jpg",
                 "IsMain": true
             }
         ]
@@ -165,7 +165,7 @@
         "Country": "East Timor",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/male/60.jpg",
+                "Url": "https://randomuser.me/api/portraits/men/60.jpg",
                 "IsMain": true
             }
         ]
@@ -184,7 +184,7 @@
         "Country": "Brazil",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/male/25.jpg",
+                "Url": "https://randomuser.me/api/portraits/men/25.jpg",
                 "IsMain": true
             }
         ]
