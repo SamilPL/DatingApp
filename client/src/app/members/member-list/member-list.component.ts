@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Member } from 'src/app/_models/member';
 import { Pagination } from 'src/app/_models/Pagination';
+import { User } from 'src/app/_models/user';
+import { UserParams } from 'src/app/_models/userParams';
+import { AccountService } from 'src/app/_services/account.service';
 import { MembersService } from 'src/app/_services/members.service';
 
 @Component({
@@ -13,19 +16,36 @@ import { MembersService } from 'src/app/_services/members.service';
 export class MemberListComponent implements OnInit {
   members: Member[];
   pagination: Pagination;
-  pageNumber = 1;
-  pageSize = 5;
+  userParams: UserParams;
+  user: User;
+
+  genderList = [
+    {value: 'male', display: 'Males'},
+    {value: 'female', display: 'Females'},
+    {value: 'other', display: 'Any'}
+  ]
 
   constructor(
-    private memberService: MembersService
-  ) { }
+    private memberService: MembersService,
+    private accountService: AccountService
+  ) { 
+    this.accountService.currentUser$
+      .pipe(
+        take(1),
+        map(user => {
+          this.user = user;
+          this.userParams = new UserParams(user);
+        })
+      ).subscribe()
+  }
 
   ngOnInit(): void {
     this.loadMembers();
   }
 
   loadMembers() {
-    this.memberService.getMembers(this.pageNumber, this.pageSize).pipe(
+    console.log('SP userParams: ', this.userParams);
+    this.memberService.getMembers(this.userParams).pipe(
       map(response => {
         this.members = response.result;
         this.pagination = response.pagination;
@@ -33,8 +53,13 @@ export class MemberListComponent implements OnInit {
     ).subscribe();
   }
 
+  resetFilters() {
+    this.userParams = new UserParams(this.user);
+    this.loadMembers();
+  }
+
   pageChanged(event: any) {
-    this.pageNumber = event.page;
+    this.userParams.pagenumber = event.page;
     this.loadMembers();
   }
 }

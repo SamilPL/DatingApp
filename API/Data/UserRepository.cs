@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,18 @@ namespace API.Data
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
+            var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+            var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+
             var query = _context.Users
+                .Where(u => u.UserName != userParams.CurrentUsername
+                    && (userParams.Gender == "other"
+                        ? (u.Gender == "male" || u.Gender == "female") 
+                        : u.Gender == userParams.Gender)
+                    && u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob)
+                .OrderByDescending(u => userParams.OrderBy == "created"
+                    ? u.Created
+                    : u.LastActive)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .AsNoTracking();
             return await PagedList<MemberDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);
