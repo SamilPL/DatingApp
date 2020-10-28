@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, pipe } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../_models/member';
@@ -17,7 +17,7 @@ export class MembersService {
   members: Member[] = [];
   user: User;
   userParams: UserParams;
-
+  memberCache = new Map();
 
   constructor(
     private http: HttpClient, private accountService: AccountService) {
@@ -41,6 +41,12 @@ export class MembersService {
   }
 
   getMembers(userParams: UserParams) {
+    /* The idea is that if we dont have a cache we go to the API and get our members 
+      but, if we do have cache and the query is identical then we retrieve the members from our cache */
+    var response = this.memberCache.get(Object.values(userParams).join('-'));
+    if (response)
+      return of(response);   
+
     let params = this.getPaginationHeaders(userParams.pagenumber, userParams.pageSize);
 
     params = params.append('maxAge', userParams.maxAge.toString());
@@ -48,7 +54,13 @@ export class MembersService {
     params = params.append('gender', userParams.gender);
     params = params.append('orderBy', userParams.orderBy);
 
-    return this.getPaginationResult<Member[]>(this.baseUrl + 'users', params);
+    return this.getPaginationResult<Member[]>(this.baseUrl + 'users', params)
+      .pipe(
+        map(response => {
+          this.memberCache.set(Object.values(userParams).join('-'), response);
+          return response;
+        })
+      );
   }
 
   getMember(username: string) {
