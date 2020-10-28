@@ -6,7 +6,14 @@ namespace API.Extensions
     {
         public static string GetUsername(this ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // Represents the Unique name property that we set inside our token
+            // eventhough it is called different (Name ~ UniqueName (TokenService.cs)) 
+            return user.FindFirst(ClaimTypes.Name)?.Value;
+        }
+
+        public static int GetUserId(this ClaimsPrincipal user)
+        {
+            return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         }
     }
 }
