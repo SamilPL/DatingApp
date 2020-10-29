@@ -64,8 +64,17 @@ export class MembersService {
   }
 
   getMember(username: string) {
-    const member = this.members.find(x => x.userName === username);
-    if (member !== undefined) return of(member);
+    console.log('SP this.memberCache: ', this.memberCache);
+    console.log('SP this.memberCache.values(): ', this.memberCache.values());
+    console.log('SP [...this.memberCache.values()]: ', [...this.memberCache.values()]);
+    const member = [...this.memberCache.values()]
+      .reduce((arr, elem) => arr.concat(elem.result), [])
+      .find((member: Member) => member.userName === username);
+    console.log('SP member: ', member);
+
+    if (member) {
+      return of(member);
+    }
     return this.http.get<Member>(this.baseUrl + 'users/' + username);
   }
 
@@ -89,11 +98,9 @@ export class MembersService {
 
   private getPaginationResult<T>(url, params: HttpParams) {
     const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
-    console.log('SP params: ', params);
     return this.http.get<T>(url, { observe: 'response', params })
       .pipe(
         map(response => {
-          console.log('SP response: ', response);
           paginatedResult.result = response.body;
           if (response.headers.get('Pagination') !== null) {
             paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
